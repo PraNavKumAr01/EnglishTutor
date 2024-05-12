@@ -3,12 +3,9 @@ import io
 import base64
 import os
 from deepgram import DeepgramClient, SpeakOptions
-from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
 from langchain.chains.llm import LLMChain
 from langchain_groq import ChatGroq
-
-load_dotenv()
 
 llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", api_key=st.secrets["GROQ_API_KEY"])
 
