@@ -29,19 +29,6 @@ def text_to_speech(transcript):
     except Exception as e:
         print(f"Exception: {e}")
 
-def play_audio(audio_bytes):
-    
-    audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
-
-    audio_html = f"""
-    <audio autoplay>
-      <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
-      Your browser does not support the audio element.
-    </audio>
-    """
-
-    st.markdown(audio_html, unsafe_allow_html=True)
-
 def get_response(question, prompt):
 
     prompt_template = PromptTemplate(
@@ -117,7 +104,8 @@ def main():
             response, review = get_conversation_response(question, prompt)
 
             audio_bytes = text_to_speech(response)
-            play_audio(audio_bytes)
+            audio_file = io.BytesIO(audio_bytes)
+            st.audio(audio_file, format='audio/wav')
 
             st.success(f"Tutors response: {response}")
             if review:
