@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
 from langchain.chains.llm import LLMChain
 from langchain_groq import ChatGroq
-from TTS import text_to_speech
 
 load_dotenv()
 
