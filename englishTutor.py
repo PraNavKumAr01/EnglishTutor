@@ -103,15 +103,15 @@ def main():
         
             response, review = get_conversation_response(question, prompt)
 
-            audio_bytes = text_to_speech(response)
-            audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
-            audio_html = f"""
+            st.session_state.audio_bytes = text_to_speech(response)
+            st.session_state.audio_base64 = base64.b64encode(st.session_state.audio_bytes).decode('utf-8')
+            st.session_state.audio_html = f"""
             <audio autoplay>
-            <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
+            <source src="data:audio/wav;base64,{st.session_state.audio_base64}" type="audio/wav">
             Your browser does not support the audio element.
             </audio>
             """
-            st.markdown(audio_html, unsafe_allow_html=True)
+            st.markdown(st.session_state.audio_html, unsafe_allow_html=True)
 
             st.success(f"Tutors response: {response}")
             if review:
