@@ -10,10 +10,10 @@ from langchain_groq import ChatGroq
 
 load_dotenv()
 
-llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", api_key=os.environ.get("GROQ_API_KEY"))
+llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", api_key=st.secrets["GROQ_API_KEY"])
 
 def text_to_speech(transcript):
-    os.environ["DEEPGRAM_API_KEY"] = os.environ.get("DEEPGRAM_API_KEY")
+    os.environ["DEEPGRAM_API_KEY"] = st.secrets["DEEPGRAM_API_KEY"]
 
     try:
         deepgram = DeepgramClient()
