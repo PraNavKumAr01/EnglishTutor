@@ -2,3 +2,4 @@ streamlit
 deepgram-sdk
 langchain
 langchain_groq
+reportlab
