@@ -7,12 +7,28 @@ from deepgram import DeepgramClient, SpeakOptions
 from langchain_core.prompts import PromptTemplate
 from langchain.chains.llm import LLMChain
 from langchain_groq import ChatGroq
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
 
-# Set up environment variables and API keys
 os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 os.environ["DEEPGRAM_API_KEY"] = st.secrets["DEEPGRAM_API_KEY"]
 
 llm = ChatGroq(temperature=0, model_name="llama3-8b-8192")
+
+def create_pdf(content, filename):
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    flowables = []
+
+    for line in content.split('\n'):
+        p = Paragraph(line, styles['Normal'])
+        flowables.append(p)
+
+    doc.build(flowables)
+    buffer.seek(0)
+    return buffer
 
 def text_to_speech(transcript):
     try:
@@ -196,8 +212,30 @@ def python_tutor():
                 st.markdown("### Exercise Answer:")
                 st.markdown(st.session_state.exercise_answer)
 
+def teacher_app():
+    st.header("Teacher's Content Generator")
+
+    subject = st.selectbox("Select a subject:", ["English", "Python", "Mathematics", "Science", "History"])
+    grade_level = st.selectbox("Select grade level:", ["Elementary", "Middle School", "High School", "College"])
+    content_type = st.selectbox("Select content type:", ["Lesson Plan", "Quiz", "Assignment", "Study Guide"])
+
+    topic = st.text_input("Enter the specific topic:")
+
+    if st.button("Generate Content"):
+        prompt = f"You are an experienced {subject} teacher creating {content_type} for {grade_level} students on the topic of {topic}. Provide a detailed and well-structured {content_type} that is appropriate for the grade level and subject matter."
+        response = get_response(prompt, "")
+
+        st.markdown(response)
+
+        # Add option to download the generated content
+        pdf_buffer = create_pdf(response, f"{subject}_{content_type}.pdf")
+        pdf_bytes = pdf_buffer.getvalue()
+        b64 = base64.b64encode(pdf_bytes).decode()
+        href = f'<a href="data:application/pdf;base64,{b64}" download="{subject}_{content_type}.pdf">Download {content_type} as PDF</a>'
+        st.markdown(href, unsafe_allow_html=True)
+
 def main():
-    st.title("AI Tutor")
+    st.title("AI Tutor and Teacher's Assistant")
 
     if "conversation_history" not in st.session_state:
         st.session_state.conversation_history = []
@@ -206,14 +244,19 @@ def main():
     if "exercise_answer" not in st.session_state:
         st.session_state.exercise_answer = ""
 
-    tutor_type = st.sidebar.selectbox("Choose a tutor:", ["English", "Python"])
+    # Add mode selection to the sidebar
+    mode = st.sidebar.radio("Select Mode:", ["Student", "Teacher"])
 
-    if tutor_type == "English":
-        english_tutor()
+    if mode == "Student":
+        tutor_type = st.sidebar.selectbox("Choose a tutor:", ["English", "Python"])
+        if tutor_type == "English":
+            english_tutor()
+        else:
+            python_tutor()
     else:
-        python_tutor()
+        teacher_app()
 
-    if st.button("Clear History"):
+    if st.sidebar.button("Clear History"):
         st.session_state.conversation_history.clear()
         st.session_state.current_response = ""
         st.session_state.exercise_answer = ""
