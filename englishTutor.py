@@ -235,7 +235,7 @@ def teacher_app():
         st.markdown(href, unsafe_allow_html=True)
 
 def main():
-    st.title("TeachWise - The Smart Education Assistant")
+    st.title("TeachWise - Educational Assistance")
 
     if "conversation_history" not in st.session_state:
         st.session_state.conversation_history = []
